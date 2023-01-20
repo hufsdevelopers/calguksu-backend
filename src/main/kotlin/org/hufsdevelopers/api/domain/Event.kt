@@ -55,4 +55,8 @@ class Event(
             false
         }
     }
+
+    override fun toString(): String {
+        return "$startYear.$startMonth.$startDay ~ $endYear.$endMonth.$endDay : $description"
+    }
 }
