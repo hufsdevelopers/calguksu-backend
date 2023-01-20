@@ -1,7 +1,5 @@
 package org.hufsdevelopers.api.controller
 
-import org.apache.coyote.Response
-import org.hufsdevelopers.api.domain.EventEntity
 import org.hufsdevelopers.api.repository.EventRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
