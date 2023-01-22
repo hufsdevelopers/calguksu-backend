@@ -1,9 +1,11 @@
 package org.hufsdevelopers.api.controller
 
 import com.google.common.io.ByteStreams.toByteArray
+import jakarta.servlet.http.HttpServletResponse
 import org.hufsdevelopers.api.domain.Event
 import org.hufsdevelopers.api.repository.EventRepository
 import org.hufsdevelopers.api.service.HUFSCalendarService
+import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -44,15 +46,16 @@ class EventController(val eventRepository: EventRepository, val HUFSCalendarServ
     }
 
 
-    @GetMapping(value = ["/cal"], produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE])
+    @GetMapping(value = ["/subscribe"], produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE])
     @ResponseBody
     @Throws(
         IOException::class
     )
-    fun getFile(): ByteArray? {
+    fun getFile(response : HttpServletResponse): FileSystemResource? {
         val calendarsDir = File("calendars")
         val calendarFile = File(calendarsDir, "hufs.ics")
 
-        return toByteArray(calendarFile.inputStream())
+        response.setHeader("Content-Disposition", "attachment; filename=" + "calendar.ics");
+        return FileSystemResource(calendarFile)
     }
 }
