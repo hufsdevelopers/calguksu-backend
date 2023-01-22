@@ -5,25 +5,19 @@ import net.fortuna.ical4j.data.CalendarOutputter
 import net.fortuna.ical4j.model.Calendar
 import net.fortuna.ical4j.model.Date
 import net.fortuna.ical4j.model.DateTime
-import net.fortuna.ical4j.model.Property
 import net.fortuna.ical4j.model.TimeZone
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory
 import net.fortuna.ical4j.model.component.VEvent
 import net.fortuna.ical4j.model.component.VTimeZone
-import net.fortuna.ical4j.model.parameter.Cn
-import net.fortuna.ical4j.model.parameter.Role
 import net.fortuna.ical4j.model.property.*
-import net.fortuna.ical4j.util.FixedUidGenerator
-import net.fortuna.ical4j.util.UidGenerator
-import org.hufsdevelopers.api.data.DateHolder
 import org.hufsdevelopers.api.domain.Event
 import org.hufsdevelopers.api.repository.CalendarRepository
 import org.hufsdevelopers.api.repository.EventRepository
 import org.jsoup.Jsoup
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.io.File
 import java.io.FileOutputStream
-import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -32,14 +26,14 @@ import java.util.*
 
 
 @Service
-class CalendarService(calendarRepository: CalendarRepository, val eventRepository: EventRepository) {
+class HUFSCalendarService(calendarRepository: CalendarRepository, val eventRepository: EventRepository) {
     companion object {
         const val URL_CALENDAR_HUFS_AC_KR = "https://www.hufs.ac.kr/user/indexSub.action?codyMenuSeq=37069&siteId=hufs"
     }
 
     val hufsofficialCalendar = calendarRepository.getReferenceById(1)
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 1000 * 60 * 60)
     fun getUpdates() {
         val wholeSource = Jsoup.connect(URL_CALENDAR_HUFS_AC_KR).get()
 
@@ -107,20 +101,26 @@ class CalendarService(calendarRepository: CalendarRepository, val eventRepositor
             } ?: return@forEach
         }
 
+        var calendarChanges = false
+
         val localFetchedEvents = eventRepository.findByCalendar(hufsofficialCalendar).toMutableList()
         sourceFetchedEvents.forEach { event ->
             if (!localFetchedEvents.remove(event)) {
                 eventRepository.save(event)
-                System.out.println("event saved ${event}")
+                calendarChanges = true
             }
         }
 
         eventRepository.deleteAll(localFetchedEvents)
-        System.out.println("${localFetchedEvents.size} events removed")
+        if (localFetchedEvents.isNotEmpty()) calendarChanges = true
+
+        if (calendarChanges) {
+            createIcsCalendar()
+        }
     }
 
 
-    fun createIcsCalendar(events: List<Event>) {
+    fun createIcsCalendar() {
         val icsCalendar = Calendar()
         icsCalendar.properties.add(ProdId("-//hufsdevelopers.org//KO"))
         icsCalendar.properties.add(Version.VERSION_2_0);
@@ -131,6 +131,7 @@ class CalendarService(calendarRepository: CalendarRepository, val eventRepositor
         icsCalendar.properties.add(XProperty("X-WR-CALNAME", "HUFS"))
         icsCalendar.properties.add(XProperty("X-APPLE-CALENDAR-COLOR", "#00677f"))
 
+        val events = eventRepository.findAll()
         events.forEach { event ->
             val startUTCTime = event.startTimestamp.withZoneSameInstant(ZoneOffset.UTC)
             val endUTCTime = event.endTimestamp.withZoneSameInstant(ZoneOffset.UTC)
@@ -182,9 +183,12 @@ class CalendarService(calendarRepository: CalendarRepository, val eventRepositor
                 )
             )
         }
-        print(icsCalendar)
-        val fout = FileOutputStream("mycalendar.ics")
 
+        val calendarsDir = File("calendars")
+        if (!calendarsDir.isDirectory) calendarsDir.mkdirs()
+        val calendarFile = File(calendarsDir, "hufs.ics")
+        if (!calendarFile.isFile) calendarFile.createNewFile()
+        val fout = FileOutputStream(calendarFile.path)
         val outputter = CalendarOutputter()
         outputter.output(icsCalendar, fout)
     }

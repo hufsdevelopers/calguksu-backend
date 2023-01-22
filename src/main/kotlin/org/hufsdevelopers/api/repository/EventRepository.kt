@@ -5,14 +5,12 @@ import org.hufsdevelopers.api.domain.Event
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 @Repository
 interface EventRepository : JpaRepository<Event, Int> {
     fun findByCalendar(calendar: Calendar): List<Event>
-
-    @Query(value = "select * from calendar.events where start_year = :year or end_year = :year", nativeQuery = true)
-    fun getEventByYear(year : Int) : List<Event>
-
-    @Query(value = "select * from calendar.events where (start_year = :year and start_month = :month) or (end_year = :year and end_month = :month)", nativeQuery = true)
-    fun getEventByYearAndMonth(year : Int, month : Int) : List<Event>
+    @Query(value = "select * from calendar.events where (events.start_timestamp between :startDate and :endDate) or (events.end_timestamp between :startDate and :endDate)", nativeQuery = true)
+    fun getEvents(startDate : ZonedDateTime, endDate : ZonedDateTime) : List<Event>
 }
