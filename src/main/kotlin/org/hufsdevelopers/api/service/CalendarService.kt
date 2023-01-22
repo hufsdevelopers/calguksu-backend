@@ -164,11 +164,11 @@ class CalendarService(calendarRepository: CalendarRepository, val eventRepositor
             }
 
             val meeting: VEvent = if (endDate != null) {
-                val start = DateTime(startDate.time).apply { isUtc = true }
-                val end = DateTime(endDate.time).apply { isUtc = true }
+                val start = if (event.allday) Date(startDate.time) else DateTime(startDate.time).apply { isUtc = true }
+                val end =  if (event.allday) Date(endDate.time) else DateTime(endDate.time).apply { isUtc = true }
                 VEvent(start, end, event.description)
             } else {
-                val start = DateTime(startDate.time).apply { isUtc = true }
+                val start =  if (event.allday) Date(startDate.time) else DateTime(startDate.time).apply { isUtc = true }
                 VEvent(start, event.description)
             }
 
