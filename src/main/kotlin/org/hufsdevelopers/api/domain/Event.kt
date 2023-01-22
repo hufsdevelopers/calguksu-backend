@@ -11,7 +11,7 @@ import java.util.*
 class Event(
     calendar: Calendar,
     startTimestamp: ZonedDateTime,
-    endTimestamp: ZonedDateTime?,
+    endTimestamp: ZonedDateTime,
     allday: Boolean = false,
     description: String
 ) {
@@ -28,7 +28,7 @@ class Event(
     var startTimestamp: ZonedDateTime = startTimestamp
 
     @Column(name = "end_timestamp")
-    var endTimestamp: ZonedDateTime? = endTimestamp
+    var endTimestamp: ZonedDateTime = endTimestamp
 
     @Column(name = "allday")
     var allday: Boolean = allday

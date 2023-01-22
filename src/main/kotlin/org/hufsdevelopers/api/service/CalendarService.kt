@@ -118,4 +118,74 @@ class CalendarService(calendarRepository: CalendarRepository, val eventRepositor
         eventRepository.deleteAll(localFetchedEvents)
         System.out.println("${localFetchedEvents.size} events removed")
     }
+
+
+    fun createIcsCalendar(events: List<Event>) {
+        val icsCalendar = Calendar()
+        icsCalendar.properties.add(ProdId("-//hufsdevelopers.org//KO"))
+        icsCalendar.properties.add(Version.VERSION_2_0);
+        icsCalendar.properties.add(CalScale.GREGORIAN)
+        icsCalendar.properties.add(Name("HUFS"))
+
+        // 애플 캘린더 용
+        icsCalendar.properties.add(XProperty("X-WR-CALNAME", "HUFS"))
+        icsCalendar.properties.add(XProperty("X-APPLE-CALENDAR-COLOR", "#00677f"))
+
+        events.forEach { event ->
+            val startUTCTime = event.startTimestamp.withZoneSameInstant(ZoneOffset.UTC)
+            val endUTCTime = event.endTimestamp.withZoneSameInstant(ZoneOffset.UTC)
+
+            val registry = TimeZoneRegistryFactory.getInstance().createRegistry()
+            val timezone: TimeZone = registry.getTimeZone("UTC")
+            val tz: VTimeZone = timezone.vTimeZone
+
+            // the "DATE" type is convert to UTC time automatically so should
+            val startDate: java.util.Calendar = GregorianCalendar()
+            startDate.timeZone = timezone
+            startDate[java.util.Calendar.YEAR] = startUTCTime.year
+            startDate[java.util.Calendar.MONTH] = startUTCTime.monthValue
+            startDate[java.util.Calendar.DATE] = startUTCTime.dayOfMonth
+            startDate[java.util.Calendar.HOUR_OF_DAY] = startUTCTime.hour
+            startDate[java.util.Calendar.MINUTE] = startUTCTime.minute
+            startDate[java.util.Calendar.SECOND] = startUTCTime.second
+
+            val hasEndDate = startUTCTime.toEpochSecond() != endUTCTime.toEpochSecond()
+
+            var endDate: java.util.Calendar? = null
+            if (hasEndDate) {
+                endDate = GregorianCalendar()
+                endDate.timeZone = timezone
+                endDate[java.util.Calendar.YEAR] = endUTCTime.year
+                endDate[java.util.Calendar.MONTH] = endUTCTime.monthValue
+                endDate[java.util.Calendar.DATE] = endUTCTime.dayOfMonth
+                endDate[java.util.Calendar.HOUR_OF_DAY] = endUTCTime.hour
+                endDate[java.util.Calendar.MINUTE] = endUTCTime.minute
+                endDate[java.util.Calendar.SECOND] = endUTCTime.second
+            }
+
+            val meeting: VEvent = if (endDate != null) {
+                val start = DateTime(startDate.time).apply { isUtc = true }
+                val end = DateTime(endDate.time).apply { isUtc = true }
+                VEvent(start, end, event.description)
+            } else {
+                val start = DateTime(startDate.time).apply { isUtc = true }
+                VEvent(start, event.description)
+            }
+
+            meeting.properties.add(tz.timeZoneId)
+            icsCalendar.components.add(meeting)
+
+            meeting.properties.add(
+                Uid(
+                    Hashing.sha256().hashString(event.toString(), StandardCharsets.UTF_8)
+                        .toString() + "@hufsdevelopers.org"
+                )
+            )
+        }
+        print(icsCalendar)
+        val fout = FileOutputStream("mycalendar.ics")
+
+        val outputter = CalendarOutputter()
+        outputter.output(icsCalendar, fout)
+    }
 }
