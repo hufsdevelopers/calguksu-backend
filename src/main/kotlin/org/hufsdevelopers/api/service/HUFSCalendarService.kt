@@ -162,6 +162,7 @@ class HUFSCalendarService(calendarRepository: CalendarRepository, val eventRepos
                 endDate[java.util.Calendar.HOUR_OF_DAY] = endUTCTime.hour
                 endDate[java.util.Calendar.MINUTE] = endUTCTime.minute
                 endDate[java.util.Calendar.SECOND] = endUTCTime.second
+                endDate.add(java.util.Calendar.DATE, 1)
             }
 
             val meeting: VEvent = if (endDate != null) {
@@ -177,10 +178,7 @@ class HUFSCalendarService(calendarRepository: CalendarRepository, val eventRepos
             icsCalendar.components.add(meeting)
 
             meeting.properties.add(
-                Uid(
-                    Hashing.sha256().hashString(event.toString(), StandardCharsets.UTF_8)
-                        .toString() + "@hufsdevelopers.org"
-                )
+                Uid(Hashing.sha256().hashString(event.toString(), StandardCharsets.UTF_8).toString())
             )
         }
 
