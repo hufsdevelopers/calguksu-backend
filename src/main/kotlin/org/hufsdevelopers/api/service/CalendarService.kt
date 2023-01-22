@@ -143,7 +143,7 @@ class CalendarService(calendarRepository: CalendarRepository, val eventRepositor
             val startDate: java.util.Calendar = GregorianCalendar()
             startDate.timeZone = timezone
             startDate[java.util.Calendar.YEAR] = startUTCTime.year
-            startDate[java.util.Calendar.MONTH] = startUTCTime.monthValue
+            startDate[java.util.Calendar.MONTH] = startUTCTime.monthValue - 1
             startDate[java.util.Calendar.DATE] = startUTCTime.dayOfMonth
             startDate[java.util.Calendar.HOUR_OF_DAY] = startUTCTime.hour
             startDate[java.util.Calendar.MINUTE] = startUTCTime.minute
@@ -156,7 +156,7 @@ class CalendarService(calendarRepository: CalendarRepository, val eventRepositor
                 endDate = GregorianCalendar()
                 endDate.timeZone = timezone
                 endDate[java.util.Calendar.YEAR] = endUTCTime.year
-                endDate[java.util.Calendar.MONTH] = endUTCTime.monthValue
+                endDate[java.util.Calendar.MONTH] = endUTCTime.monthValue - 1
                 endDate[java.util.Calendar.DATE] = endUTCTime.dayOfMonth
                 endDate[java.util.Calendar.HOUR_OF_DAY] = endUTCTime.hour
                 endDate[java.util.Calendar.MINUTE] = endUTCTime.minute
@@ -165,10 +165,10 @@ class CalendarService(calendarRepository: CalendarRepository, val eventRepositor
 
             val meeting: VEvent = if (endDate != null) {
                 val start = if (event.allday) Date(startDate.time) else DateTime(startDate.time).apply { isUtc = true }
-                val end =  if (event.allday) Date(endDate.time) else DateTime(endDate.time).apply { isUtc = true }
+                val end = if (event.allday) Date(endDate.time) else DateTime(endDate.time).apply { isUtc = true }
                 VEvent(start, end, event.description)
             } else {
-                val start =  if (event.allday) Date(startDate.time) else DateTime(startDate.time).apply { isUtc = true }
+                val start = if (event.allday) Date(startDate.time) else DateTime(startDate.time).apply { isUtc = true }
                 VEvent(start, event.description)
             }
 
