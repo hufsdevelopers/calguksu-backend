@@ -3,7 +3,9 @@ package org.hufsdevelopers.api.service
 import com.google.common.hash.Hashing
 import net.fortuna.ical4j.data.CalendarOutputter
 import net.fortuna.ical4j.model.Calendar
+import net.fortuna.ical4j.model.Date
 import net.fortuna.ical4j.model.DateTime
+import net.fortuna.ical4j.model.Property
 import net.fortuna.ical4j.model.TimeZone
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory
 import net.fortuna.ical4j.model.component.VEvent
@@ -23,6 +25,9 @@ import org.springframework.stereotype.Service
 import java.io.FileOutputStream
 import java.net.URI
 import java.nio.charset.StandardCharsets
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.util.*
 
 
@@ -56,30 +61,47 @@ class CalendarService(calendarRepository: CalendarRepository, val eventRepositor
                 val description = it.getElementsByTag("span").first()?.text() ?: return@forEach
                 if (description.isBlank()) return@forEach
 
-                val startDate: DateHolder = eventDates[0].split(".").let { date ->
+                val startDate: ZonedDateTime = eventDates[0].split(".").let { date ->
                     val month = date[0].toInt()
                     val day = date[1].toInt()
                     val year = if (calendarDate.second >= month) calendarDate.first else calendarDate.first - 1
-                    DateHolder(year, month, day)
+
+                    ZonedDateTime.of(
+                        year,
+                        month,
+                        day,
+                        9,
+                        0,
+                        0,
+                        0,
+                        ZoneId.of("Asia/Seoul")
+                    )
                 }
 
-                val endDate: DateHolder? = eventDates.getOrNull(1)?.split(".")?.let { date ->
+                val endDate: ZonedDateTime? = eventDates.getOrNull(1)?.split(".")?.let { date ->
                     val month = date[0].toInt()
                     val day = date[1].toInt()
                     val year = if (calendarDate.second <= month) calendarDate.first else calendarDate.first + 1
-                    DateHolder(year, month, day)
+
+                    ZonedDateTime.of(
+                        year,
+                        month,
+                        day,
+                        21,
+                        0,
+                        0,
+                        0,
+                        ZoneId.of("Asia/Seoul")
+                    )
                 }
 
                 sourceFetchedEvents.add(
                     Event(
                         calendar = hufsofficialCalendar,
-                        startYear = startDate.year,
-                        startMonth = startDate.month,
-                        startDay = startDate.day,
-                        endYear = endDate?.year ?: startDate.year,
-                        endMonth = endDate?.month ?: startDate.month,
-                        endDay = endDate?.day ?: startDate.day,
-                        description = description
+                        startTimestamp = startDate,
+                        endTimestamp = endDate ?: startDate,
+                        description = description,
+                        allday = true
                     )
                 )
             } ?: return@forEach
@@ -95,75 +117,5 @@ class CalendarService(calendarRepository: CalendarRepository, val eventRepositor
 
         eventRepository.deleteAll(localFetchedEvents)
         System.out.println("${localFetchedEvents.size} events removed")
-    }
-
-    fun createIcsCalendar(events: List<Event>) {
-        val icsCalendar = Calendar()
-        icsCalendar.properties.add(ProdId("-//hufsdevelopers.org//KO"))
-        icsCalendar.properties.add(Version.VERSION_2_0);
-        icsCalendar.properties.add(CalScale.GREGORIAN)
-        icsCalendar.properties.add(Name("HUFS"))
-
-        events.forEach { event ->
-            val registry = TimeZoneRegistryFactory.getInstance().createRegistry()
-            val timezone: TimeZone = registry.getTimeZone("Asia/Seoul")
-            val tz: VTimeZone = timezone.vTimeZone
-
-            val startDate: java.util.Calendar = GregorianCalendar()
-            startDate.timeZone = timezone
-            startDate[java.util.Calendar.MONTH] = event.startMonth - 1
-            startDate[java.util.Calendar.DAY_OF_MONTH] = event.startDay
-            startDate[java.util.Calendar.YEAR] = event.startYear
-
-            val hasEndDate =
-                !(event.startYear == event.endYear && event.startMonth == event.endMonth && event.startDay == event.endDay)
-
-            var endDate: java.util.Calendar? = null
-            if (hasEndDate) {
-                endDate = GregorianCalendar()
-                endDate.timeZone = timezone
-                endDate[java.util.Calendar.MONTH] = event.endMonth - 1
-                endDate[java.util.Calendar.DAY_OF_MONTH] = event.endDay
-                endDate[java.util.Calendar.YEAR] = event.endYear
-            }
-
-            val meeting: VEvent = if (endDate != null) {
-                val start = DateTime(startDate.time)
-                val end = DateTime(endDate.time)
-                VEvent(start, end, event.description)
-            } else {
-                val start = DateTime(startDate.time)
-                VEvent(start, event.description)
-            }
-
-            meeting.properties.add(tz.timeZoneId)
-            icsCalendar.components.add(meeting)
-
-            /* val ug = FixedUidGenerator("uidGen")
-             val uid = ug.generateUid()*/
-
-            meeting.properties.add(
-                Uid(
-                    Hashing.sha256().hashString(event.toString(), StandardCharsets.UTF_8)
-                        .toString() + "@hufsdevelopers.org"
-                )
-            )
-            /*   val dev1 = Attendee(URI.create("mailto:dev1@mycompany.com"))
-               dev1.parameters.add(Role.REQ_PARTICIPANT)
-               dev1.parameters.add(Cn("Developer 1"))
-               meeting.properties.add(dev1)
-
-               val dev2 = Attendee(URI.create("mailto:dev2@mycompany.com"))
-               dev2.parameters.add(Role.OPT_PARTICIPANT)
-               dev2.parameters.add(Cn("Developer 2"))
-               meeting.properties.add(dev2)*/
-
-        }
-
-        print(icsCalendar)
-        val fout = FileOutputStream("mycalendar.ics")
-
-        val outputter = CalendarOutputter()
-        outputter.output(icsCalendar, fout)
     }
 }

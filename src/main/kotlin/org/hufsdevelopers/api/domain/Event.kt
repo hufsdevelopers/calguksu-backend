@@ -1,13 +1,19 @@
 package org.hufsdevelopers.api.domain
 
 import jakarta.persistence.*
+import java.sql.Timestamp
+import java.time.ZonedDateTime
+import java.util.*
 
 
 @Table(name = "events")
 @Entity
 class Event(
-    calendar: Calendar, startYear: Int, startMonth: Int, startDay: Int,
-    endYear: Int, endMonth: Int, endDay: Int, description: String
+    calendar: Calendar,
+    startTimestamp: ZonedDateTime,
+    endTimestamp: ZonedDateTime?,
+    allday: Boolean = false,
+    description: String
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,29 +24,14 @@ class Event(
     var calendar: Calendar? = calendar
         private set
 
-    @Column(name = "startYear")
-    var startYear: Int = startYear
-        private set
+    @Column(name = "start_timestamp")
+    var startTimestamp: ZonedDateTime = startTimestamp
 
-    @Column(name = "startMonth")
-    var startMonth: Int = startMonth
-        private set
+    @Column(name = "end_timestamp")
+    var endTimestamp: ZonedDateTime? = endTimestamp
 
-    @Column(name = "startDay")
-    var startDay: Int = startDay
-        private set
-
-    @Column(name = "endYear")
-    var endYear: Int = endYear
-        private set
-
-    @Column(name = "endMonth")
-    var endMonth: Int = endMonth
-        private set
-
-    @Column(name = "endDay")
-    var endDay: Int = endDay
-        private set
+    @Column(name = "allday")
+    var allday: Boolean = allday
 
     @Column(name = "description", length = 500)
     var description: String = description
@@ -48,15 +39,13 @@ class Event(
 
     override fun equals(other: Any?): Boolean {
         return if (other is Event) {
-            startDay == other.startDay && startMonth == other.startMonth && startYear == other.startYear &&
-                    endDay == other.endDay && endMonth == other.endMonth && endYear == other.endYear &&
-                    description == other.description
+            (startTimestamp.toEpochSecond() == other.startTimestamp.toEpochSecond()) && (endTimestamp?.toEpochSecond() == other.endTimestamp?.toEpochSecond()) && description == other.description
         } else {
             false
         }
     }
 
     override fun toString(): String {
-        return "$startYear.$startMonth.$startDay ~ $endYear.$endMonth.$endDay : $description"
+        return "$startTimestamp ~ $endTimestamp : $description"
     }
 }
