@@ -46,7 +46,7 @@ class EventController(val eventRepository: EventRepository, val HUFSCalendarServ
     }
 
 
-    @GetMapping(value = ["/subscribe"], produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE])
+    @GetMapping(value = ["/subscribe"], produces = ["text/calendar"])
     @ResponseBody
     @Throws(
         IOException::class
@@ -55,7 +55,7 @@ class EventController(val eventRepository: EventRepository, val HUFSCalendarServ
         val calendarsDir = File("calendars")
         val calendarFile = File(calendarsDir, "hufs.ics")
 
-        response.setHeader("Content-Disposition", "attachment; filename=" + "calendar.ics");
+        response.setHeader("Content-Disposition", "attachment; filename=" + "calendar.ics")
         return FileSystemResource(calendarFile)
     }
 }
