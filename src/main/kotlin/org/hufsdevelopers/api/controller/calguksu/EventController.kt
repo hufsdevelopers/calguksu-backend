@@ -1,4 +1,4 @@
-package org.hufsdevelopers.api.controller
+package org.hufsdevelopers.api.controller.calguksu
 
 import com.google.common.io.ByteStreams.toByteArray
 import jakarta.servlet.http.HttpServletResponse
@@ -17,7 +17,7 @@ import java.time.ZonedDateTime
 
 
 @RestController
-@RequestMapping("/events")
+@RequestMapping("/calguksu/events")
 class EventController(val eventRepository: EventRepository, val HUFSCalendarService: HUFSCalendarService) {
     @GetMapping()
     fun getEvents(@RequestParam year: Int?, @RequestParam month: Int?): ResponseEntity<List<Event>> {

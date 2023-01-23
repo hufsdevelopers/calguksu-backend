@@ -2,19 +2,22 @@ package org.hufsdevelopers.api.domain
 
 import jakarta.persistence.*
 
-@Entity
 @Table(name = "calendars")
-class Calendar() {
+@Entity
+class Calendar(name: String, title: String, description: String?) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val calendarId: Int? = null
+    val calendarId: Int? = null
 
     @Column(name = "name", length = 20, nullable = false)
-    private var name: String? = null
+    var name: String = name
+        private set
 
     @Column(name = "title", length = 50, nullable = false)
-    private var title: String? = null
+    var title: String = title
+        private set
 
     @Column(name = "description", length = 200, nullable = true)
-    private var description: String? = null
+    var description: String? = description
+        private set
 }
