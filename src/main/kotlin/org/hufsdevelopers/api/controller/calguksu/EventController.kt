@@ -3,7 +3,9 @@ package org.hufsdevelopers.api.controller.calguksu
 import com.google.common.io.ByteStreams.toByteArray
 import jakarta.servlet.http.HttpServletResponse
 import org.hufsdevelopers.api.domain.Event
+import org.hufsdevelopers.api.repository.CalendarRepository
 import org.hufsdevelopers.api.repository.EventRepository
+import org.hufsdevelopers.api.responseentities.EventReponseEntity
 import org.hufsdevelopers.api.service.HUFSCalendarService
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpStatus
@@ -18,31 +20,46 @@ import java.time.ZonedDateTime
 
 @RestController
 @RequestMapping("/calguksu/events")
-class EventController(val eventRepository: EventRepository, val HUFSCalendarService: HUFSCalendarService) {
+class EventController(val calendarRepository: CalendarRepository, val eventRepository: EventRepository) {
     @GetMapping()
-    fun getEvents(@RequestParam year: Int?, @RequestParam month: Int?): ResponseEntity<List<Event>> {
-        if (month != null && year == null) {
+    fun getEvents(
+        @RequestParam calendarName: String,
+        @RequestParam year: Int?,
+        @RequestParam month: Int?
+    ): ResponseEntity<List<EventReponseEntity>> {
+        if (calendarName == null || (month != null && year == null)) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
-        if (year != null && month != null) {
-            val events = eventRepository.getEvents(
-                ZonedDateTime.of(year, month, 1, 0, 0, 0 ,0, ZoneId.of("Asia/Seoul")),
-                ZonedDateTime.of(year, month, 31, 23, 59, 59 ,0, ZoneId.of("Asia/Seoul"))
-            )
-            return ResponseEntity.ok(events)
+        val calendar = calendarRepository.findFirstByName(calendarName)
+
+        var events: List<Event> = if (year != null) {
+            if (month != null) {
+                eventRepository.getEvents(
+                    calendar.calendarId!!,
+                    ZonedDateTime.of(year, month, 1, 0, 0, 0, 0, ZoneId.of("Asia/Seoul")),
+                    ZonedDateTime.of(year, month, 1, 0, 0, 0, 0, ZoneId.of("Asia/Seoul")).plusMonths(1).minusNanos(1)
+                )
+            } else {
+                eventRepository.getEvents(
+                    calendar.calendarId!!,
+                    ZonedDateTime.of(year, 1, 1, 0, 0, 0, 0, ZoneId.of("Asia/Seoul")),
+                    ZonedDateTime.of(year, 12, 31, 23, 59, 59, 0, ZoneId.of("Asia/Seoul"))
+                )
+            }
+        } else {
+            eventRepository.findByCalendar(calendar)
         }
 
-        if (year != null) {
-            val events = eventRepository.getEvents(
-                ZonedDateTime.of(year, 1, 1, 0, 0, 0 ,0, ZoneId.of("Asia/Seoul")),
-                ZonedDateTime.of(year, 12, 31, 23, 59, 59 ,0, ZoneId.of("Asia/Seoul"))
+        return ResponseEntity.ok(events.map {
+            EventReponseEntity(
+                it.calendar!!.name,
+                it.startTimestamp.toString(),
+                it.endTimestamp.toString(),
+                it.allday,
+                it.description
             )
-            return ResponseEntity.ok(events)
-        }
-
-        val events = eventRepository.findAll()
-        return ResponseEntity.ok(events)
+        })
     }
 
 
@@ -51,7 +68,7 @@ class EventController(val eventRepository: EventRepository, val HUFSCalendarServ
     @Throws(
         IOException::class
     )
-    fun getFile(response : HttpServletResponse): FileSystemResource? {
+    fun getFile(response: HttpServletResponse): FileSystemResource? {
         val calendarsDir = File("calendars")
         val calendarFile = File(calendarsDir, "hufs.ics")
 

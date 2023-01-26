@@ -11,6 +11,6 @@ import java.time.ZonedDateTime
 @Repository
 interface EventRepository : JpaRepository<Event, Int> {
     fun findByCalendar(calendar: Calendar): List<Event>
-    @Query(value = "select * from calendar.events where (events.start_timestamp between :startDate and :endDate) or (events.end_timestamp between :startDate and :endDate)", nativeQuery = true)
-    fun getEvents(startDate : ZonedDateTime, endDate : ZonedDateTime) : List<Event>
+    @Query(value = "select * from calendar.events where (events.calendar_id = :calendarId) and ((events.start_timestamp between :startDate and :endDate) or (events.end_timestamp between :startDate and :endDate)) ", nativeQuery = true)
+    fun getEvents(calendarId : Int, startDate : ZonedDateTime, endDate : ZonedDateTime) : List<Event>
 }
