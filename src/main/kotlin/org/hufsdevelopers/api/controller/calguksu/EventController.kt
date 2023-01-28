@@ -27,13 +27,13 @@ class EventController(val calendarRepository: CalendarRepository, val eventRepos
         @RequestParam year: Int?,
         @RequestParam month: Int?
     ): ResponseEntity<List<EventReponseEntity>> {
-        if (calendarName == null || (month != null && year == null)) {
+        if (month != null && year == null) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
 
         val calendar = calendarRepository.findFirstByName(calendarName)
 
-        var events: List<Event> = if (year != null) {
+        val events: List<Event> = if (year != null) {
             if (month != null) {
                 eventRepository.getEvents(
                     calendar.calendarId!!,
