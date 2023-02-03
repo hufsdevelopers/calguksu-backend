@@ -184,7 +184,7 @@ class HUFSCalendarService(calendarRepository: CalendarRepository, val eventRepos
 
         val calendarsDir = File("calendars")
         if (!calendarsDir.isDirectory) calendarsDir.mkdirs()
-        val calendarFile = File(calendarsDir, "hufs.ics")
+        val calendarFile = File(calendarsDir, "hufsofficial.ics")
         if (!calendarFile.isFile) calendarFile.createNewFile()
         val fout = FileOutputStream(calendarFile.path)
         val outputter = CalendarOutputter()

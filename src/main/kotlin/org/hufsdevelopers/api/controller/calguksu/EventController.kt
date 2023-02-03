@@ -61,18 +61,4 @@ class EventController(val calendarRepository: CalendarRepository, val eventRepos
             )
         })
     }
-
-
-    @GetMapping(value = ["/subscribe"], produces = ["text/calendar"])
-    @ResponseBody
-    @Throws(
-        IOException::class
-    )
-    fun getFile(response: HttpServletResponse): FileSystemResource? {
-        val calendarsDir = File("calendars")
-        val calendarFile = File(calendarsDir, "hufs.ics")
-
-        response.setHeader("Content-Disposition", "attachment; filename=" + "calendar.ics")
-        return FileSystemResource(calendarFile)
-    }
 }
