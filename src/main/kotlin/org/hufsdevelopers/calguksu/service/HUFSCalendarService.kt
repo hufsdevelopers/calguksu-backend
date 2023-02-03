@@ -1,4 +1,4 @@
-package org.hufsdevelopers.api.service
+package org.hufsdevelopers.calguksu.service
 
 import com.google.common.hash.Hashing
 import net.fortuna.ical4j.data.CalendarOutputter
@@ -10,9 +10,9 @@ import net.fortuna.ical4j.model.TimeZoneRegistryFactory
 import net.fortuna.ical4j.model.component.VEvent
 import net.fortuna.ical4j.model.component.VTimeZone
 import net.fortuna.ical4j.model.property.*
-import org.hufsdevelopers.api.domain.Event
-import org.hufsdevelopers.api.repository.CalendarRepository
-import org.hufsdevelopers.api.repository.EventRepository
+import org.hufsdevelopers.calguksu.domain.Event
+import org.hufsdevelopers.calguksu.repository.CalendarRepository
+import org.hufsdevelopers.calguksu.repository.EventRepository
 import org.jsoup.Jsoup
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service

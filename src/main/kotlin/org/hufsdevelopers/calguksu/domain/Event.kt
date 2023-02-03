@@ -1,9 +1,7 @@
-package org.hufsdevelopers.api.domain
+package org.hufsdevelopers.calguksu.domain
 
 import jakarta.persistence.*
-import java.sql.Timestamp
 import java.time.ZonedDateTime
-import java.util.*
 
 
 @Table(name = "events")

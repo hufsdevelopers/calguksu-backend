@@ -1,11 +1,10 @@
-package org.hufsdevelopers.api.repository
+package org.hufsdevelopers.calguksu.repository
 
-import org.hufsdevelopers.api.domain.Calendar
-import org.hufsdevelopers.api.domain.Event
+import org.hufsdevelopers.calguksu.domain.Calendar
+import org.hufsdevelopers.calguksu.domain.Event
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 @Repository

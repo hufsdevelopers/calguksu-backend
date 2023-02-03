@@ -1,8 +1,8 @@
-package org.hufsdevelopers.api.controller.calguksu
+package org.hufsdevelopers.calguksu.controller.calguksu
 
 import jakarta.servlet.http.HttpServletResponse
-import org.hufsdevelopers.api.domain.Calendar
-import org.hufsdevelopers.api.repository.CalendarRepository
+import org.hufsdevelopers.calguksu.domain.Calendar
+import org.hufsdevelopers.calguksu.repository.CalendarRepository
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

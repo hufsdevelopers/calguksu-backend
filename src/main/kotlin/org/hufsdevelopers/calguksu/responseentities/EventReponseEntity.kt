@@ -1,4 +1,4 @@
-package org.hufsdevelopers.api.responseentities
+package org.hufsdevelopers.calguksu.responseentities
 
 data class EventReponseEntity(
     val calendarName: String,

@@ -1,19 +1,12 @@
-package org.hufsdevelopers.api.controller.calguksu
+package org.hufsdevelopers.calguksu.controller.calguksu
 
-import com.google.common.io.ByteStreams.toByteArray
-import jakarta.servlet.http.HttpServletResponse
-import org.hufsdevelopers.api.domain.Event
-import org.hufsdevelopers.api.repository.CalendarRepository
-import org.hufsdevelopers.api.repository.EventRepository
-import org.hufsdevelopers.api.responseentities.EventReponseEntity
-import org.hufsdevelopers.api.service.HUFSCalendarService
-import org.springframework.core.io.FileSystemResource
+import org.hufsdevelopers.calguksu.domain.Event
+import org.hufsdevelopers.calguksu.repository.CalendarRepository
+import org.hufsdevelopers.calguksu.repository.EventRepository
+import org.hufsdevelopers.calguksu.responseentities.EventReponseEntity
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.io.File
-import java.io.IOException
 import java.time.ZoneId
 import java.time.ZonedDateTime
 

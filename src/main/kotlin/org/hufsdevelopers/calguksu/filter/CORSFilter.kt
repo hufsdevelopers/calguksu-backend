@@ -1,4 +1,4 @@
-package org.hufsdevelopers.api.filter
+package org.hufsdevelopers.calguksu.filter
 
 import jakarta.servlet.*
 import jakarta.servlet.http.HttpServletRequest

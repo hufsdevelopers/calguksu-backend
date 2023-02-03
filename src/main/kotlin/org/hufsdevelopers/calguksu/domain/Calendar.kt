@@ -1,4 +1,4 @@
-package org.hufsdevelopers.api.domain
+package org.hufsdevelopers.calguksu.domain
 
 import jakarta.persistence.*
 
