@@ -114,7 +114,7 @@ class HUFSCalendarService(calendarRepository: CalendarRepository, val eventRepos
         eventRepository.deleteAll(localFetchedEvents)
         if (localFetchedEvents.isNotEmpty()) calendarChanges = true
 
-        if (calendarChanges) {
+        if (calendarChanges || !File("calendars/hufsofficial.ics").exists()) {
             createIcsCalendar()
         }
     }

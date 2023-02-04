@@ -12,7 +12,7 @@ import java.time.ZonedDateTime
 
 
 @RestController
-@RequestMapping("/calguksu/events")
+@RequestMapping("/events")
 class EventController(val calendarRepository: CalendarRepository, val eventRepository: EventRepository) {
     @GetMapping()
     fun getEvents(

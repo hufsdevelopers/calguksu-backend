@@ -13,7 +13,7 @@ import java.io.IOException
 
 
 @RestController
-@RequestMapping("/calguksu/calendars")
+@RequestMapping("/calendars")
 class CalendarController(val calendarRepository: CalendarRepository) {
 
     @GetMapping()
@@ -40,9 +40,14 @@ class CalendarController(val calendarRepository: CalendarRepository) {
     )
     fun getFile(
         response: HttpServletResponse,
-        @PathVariable("name") name: String,
-        @RequestParam(value = "id") id: String
+        @PathVariable("name") name: String?,
+        @RequestParam(value = "id") id: String?
     ): FileSystemResource? {
+        if (id != "ee287dad-ac9d-4c5f-922d-034f46b04adf") {
+            throw ResponseStatusException(
+                HttpStatus.UNAUTHORIZED, "request denied"
+            )
+        }
         if (name == "hufsofficial") {
             val calendarsDir = File("calendars")
             val calendarFile = File(calendarsDir, "hufsofficial.ics")
