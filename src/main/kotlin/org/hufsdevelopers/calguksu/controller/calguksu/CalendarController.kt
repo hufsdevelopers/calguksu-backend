@@ -1,8 +1,12 @@
 package org.hufsdevelopers.calguksu.controller.calguksu
 
 import jakarta.servlet.http.HttpServletResponse
+import org.hufsdevelopers.calguksu.data.HttpResponse
 import org.hufsdevelopers.calguksu.domain.Calendar
+import org.hufsdevelopers.calguksu.exceptions.CalendarNotFoundException
+import org.hufsdevelopers.calguksu.exceptions.HttpReponseExcetion
 import org.hufsdevelopers.calguksu.repository.CalendarRepository
+import org.hufsdevelopers.calguksu.repository.SubscriberRepository
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -10,25 +14,30 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.io.File
 import java.io.IOException
+import java.time.ZonedDateTime
 
 
 @RestController
 @RequestMapping("/calendars")
-class CalendarController(val calendarRepository: CalendarRepository) {
+class CalendarController(val calendarRepository: CalendarRepository, val subscriberRepository: SubscriberRepository) {
 
     @GetMapping()
-    fun getCalendars(): ResponseEntity<List<Calendar>> {
+    fun getCalendars(): ResponseEntity<HttpResponse<List<Calendar>>> {
         val cal = calendarRepository.findAll()
-        println(cal)
-        return ResponseEntity.ok(calendarRepository.findAll())
+        return ResponseEntity.ok(HttpResponse(true, calendarRepository.findAll()))
     }
 
     @GetMapping("/{name}")
-    fun getCalendar(@PathVariable("name") name: String): ResponseEntity<Calendar> {
+    fun getCalendar(@PathVariable("name") name: String): ResponseEntity<Any> {
         return try {
-            ResponseEntity.ok(calendarRepository.findFirstByName(name))
+            calendarRepository.findFirstByName(name)?.let {
+               return ResponseEntity.ok(HttpResponse(true, it))
+            }
+            ResponseEntity.status(404).body(HttpResponse(false, CalendarNotFoundException().message))
+        } catch (e: HttpReponseExcetion) {
+            ResponseEntity.status(e.httpErrorCode).body(HttpResponse(false, e.message))
         } catch (e: Exception) {
-            ResponseEntity(HttpStatus.NOT_FOUND)
+            ResponseEntity.status(404).body(HttpResponse(false, CalendarNotFoundException().message))
         }
     }
 
@@ -41,23 +50,29 @@ class CalendarController(val calendarRepository: CalendarRepository) {
     fun getFile(
         response: HttpServletResponse,
         @PathVariable("name") name: String?,
-        @RequestParam(value = "id") id: String?
+        @RequestParam(value = "token") token: String
     ): FileSystemResource? {
-        if (id != "ee287dad-ac9d-4c5f-922d-034f46b04adf") {
+        // 현재 hufsofficial 만 지원함.
+        if (name != "hufsofficial") {
             throw ResponseStatusException(
-                HttpStatus.UNAUTHORIZED, "request denied"
+                HttpStatus.NOT_FOUND, "sorry! not supported calendar currently."
             )
-        }
-        if (name == "hufsofficial") {
+        } else {
+            val calendar = calendarRepository.findFirstByName("hufsofficial")
+            val subscriber = subscriberRepository.findByTokenAndCalendar(token, calendar!!)
+                ?: throw ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED, "잘못된 접근입니다."
+                )
+
+            subscriberRepository.save(subscriber.apply {
+                lastrequestedOn = ZonedDateTime.now()
+            })
+
             val calendarsDir = File("calendars")
             val calendarFile = File(calendarsDir, "hufsofficial.ics")
 
             response.setHeader("Content-Disposition", "attachment; filename=" + "calendar.ics")
             return FileSystemResource(calendarFile)
-        } else {
-            throw ResponseStatusException(
-                HttpStatus.NOT_FOUND, "sorry! not supported calendar currently."
-            )
         }
     }
 }

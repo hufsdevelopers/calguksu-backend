@@ -1,5 +1,6 @@
 package org.hufsdevelopers.calguksu.controller.calguksu
 
+import org.hufsdevelopers.calguksu.data.HttpResponse
 import org.hufsdevelopers.calguksu.domain.Event
 import org.hufsdevelopers.calguksu.repository.CalendarRepository
 import org.hufsdevelopers.calguksu.repository.EventRepository
@@ -19,12 +20,12 @@ class EventController(val calendarRepository: CalendarRepository, val eventRepos
         @RequestParam calendarName: String,
         @RequestParam year: Int?,
         @RequestParam month: Int?
-    ): ResponseEntity<List<EventReponseEntity>> {
+    ): ResponseEntity<Any> {
         if (month != null && year == null) {
-            return ResponseEntity(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.badRequest().body(HttpResponse(false, "field 'year' required"))
         }
 
-        val calendar = calendarRepository.findFirstByName(calendarName)
+        val calendar = calendarRepository.findFirstByName(calendarName) ?: return ResponseEntity(HttpStatus.BAD_REQUEST)
 
         val events: List<Event> = if (year != null) {
             if (month != null) {
@@ -44,7 +45,7 @@ class EventController(val calendarRepository: CalendarRepository, val eventRepos
             eventRepository.findByCalendar(calendar)
         }
 
-        return ResponseEntity.ok(events.map {
+        return ResponseEntity.ok(HttpResponse(true, events.map {
             EventReponseEntity(
                 it.calendar!!.name,
                 it.startTimestamp.toString(),
@@ -52,6 +53,6 @@ class EventController(val calendarRepository: CalendarRepository, val eventRepos
                 it.allday,
                 it.description
             )
-        })
+        }))
     }
 }

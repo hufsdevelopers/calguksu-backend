@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CalendarRepository : JpaRepository<Calendar, Int> {
-    fun findFirstByName(calendarName: String): Calendar
+    fun findFirstByName(calendarName: String): Calendar?
 }

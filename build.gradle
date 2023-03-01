@@ -33,6 +33,11 @@ dependencies {
 	implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	implementation platform('software.amazon.awssdk:bom:2.20.4')
+	implementation 'software.amazon.awssdk:sesv2'
+
+	implementation 'commons-validator:commons-validator:1.4.1'
 }
 
 tasks.withType(KotlinCompile) {

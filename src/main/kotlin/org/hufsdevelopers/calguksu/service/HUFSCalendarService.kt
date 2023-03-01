@@ -88,7 +88,6 @@ class HUFSCalendarService(calendarRepository: CalendarRepository, val eventRepos
                         ZoneId.of("Asia/Seoul")
                     )
                 }
-
                 sourceFetchedEvents.add(
                     Event(
                         calendar = hufsofficialCalendar,
