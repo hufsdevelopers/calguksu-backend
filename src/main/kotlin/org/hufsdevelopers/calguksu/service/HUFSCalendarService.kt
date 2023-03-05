@@ -33,7 +33,7 @@ class HUFSCalendarService(calendarRepository: CalendarRepository, val eventRepos
 
     val hufsofficialCalendar = calendarRepository.getReferenceById(1)
 
-    @Scheduled(fixedRate = 1000 * 60 * 60)
+    @Scheduled(fixedRate = 1000 * 60 * 10)
     fun getUpdates() {
         val wholeSource = Jsoup.connect(URL_CALENDAR_HUFS_AC_KR).get()
 
@@ -103,7 +103,9 @@ class HUFSCalendarService(calendarRepository: CalendarRepository, val eventRepos
         var calendarChanges = false
 
         val localFetchedEvents = eventRepository.findByCalendar(hufsofficialCalendar).toMutableList()
-        sourceFetchedEvents.forEach { event ->
+        sourceFetchedEvents.distinctBy {
+            it.toString()
+        }.forEach { event ->
             if (!localFetchedEvents.remove(event)) {
                 eventRepository.save(event)
                 calendarChanges = true
