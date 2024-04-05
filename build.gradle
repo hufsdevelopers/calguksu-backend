@@ -1,11 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id 'org.springframework.boot' version '3.0.1'
-	id 'io.spring.dependency-management' version '1.1.0'
-	id 'org.jetbrains.kotlin.jvm' version '1.7.22'
-	id 'org.jetbrains.kotlin.plugin.spring' version '1.7.22'
-	id "org.jetbrains.kotlin.plugin.jpa" version "1.7.22"
+    id 'org.springframework.boot' version '3.0.1'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.21'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.21'
+    id "org.jetbrains.kotlin.plugin.jpa" version '1.9.21'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.0'
 }
 
 group = 'org.hufsdevelopers'
@@ -13,40 +14,46 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
-	implementation 'org.jetbrains.kotlin:kotlin-reflect'
-	implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.3'
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.15.3'
 
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
-	implementation group: 'org.mnode.ical4j', name: 'ical4j', version: '3.2.8'
+    implementation group: 'org.mnode.ical4j', name: 'ical4j', version: '3.2.8'
 
-	implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '31.1-jre'
 
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	implementation platform('software.amazon.awssdk:bom:2.20.4')
-	implementation 'software.amazon.awssdk:sesv2'
+    implementation platform('software.amazon.awssdk:bom:2.20.4')
+    implementation 'software.amazon.awssdk:sesv2'
 
-	implementation 'commons-validator:commons-validator:1.4.1'
+    implementation 'commons-validator:commons-validator:1.4.1'
+
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1-Beta'
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1'
 }
 
 tasks.withType(KotlinCompile) {
-	kotlinOptions {
-		freeCompilerArgs = ['-Xjsr305=strict']
-		jvmTarget = '17'
-	}
+    kotlinOptions {
+        freeCompilerArgs = ['-Xjsr305=strict']
+        jvmTarget = '17'
+    }
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

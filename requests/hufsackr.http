@@ -1,0 +1,4 @@
+POST https://www.hufs.ac.kr/schdulMain/hufs/6/jsonYearSchdul.do
+Content-Type: application/x-www-form-urlencoded
+
+year=2024&month=0
