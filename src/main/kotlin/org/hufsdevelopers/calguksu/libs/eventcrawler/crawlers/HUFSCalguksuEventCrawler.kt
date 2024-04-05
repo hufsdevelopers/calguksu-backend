@@ -47,6 +47,8 @@ class HUFSCalguksuEventCrawler : CalguksuEventCrawler() {
                     .block()
             } ?: continue
 
+            events.addAll(parseJsonToCrawledEvents(response))
+
             currentMonth = currentMonth.plusMonths(1)
         }
         return events.distinctCrawledEvents()
