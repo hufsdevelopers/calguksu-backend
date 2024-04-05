@@ -29,12 +29,13 @@ class SubscribeController(
             val calendar =
                 calendarRepository.findFirstByName(form.calendarName) ?: throw CalendarNotFoundException()
 
-            subscribeService.subscribe(calendar, form.email)
+            subscribeService.subscribe(calendar, form.email, form.subscribeNewsletter ?: false)
 
             return ResponseEntity.ok(HttpResponse(true, "SUCCESS"))
         } catch (e: HttpReponseExcetion) {
             return ResponseEntity.status(e.httpErrorCode).body(HttpResponse(false, e.message))
         } catch (e: Exception) {
+            e.printStackTrace()
             return ResponseEntity.status(500).body(HttpResponse(false, "unknown"))
         }
     }

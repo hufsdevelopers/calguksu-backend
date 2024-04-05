@@ -1,0 +1,4 @@
+POST localhost:1113/subscribe
+Content-Type: application/json
+
+{ "email" : "luckytmrw@gmail.com", "calendarName" : "hufsofficial", "subscribeNewsletter" : true }

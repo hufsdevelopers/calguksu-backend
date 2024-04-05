@@ -6,6 +6,6 @@ import jakarta.validation.constraints.Pattern
 data class SubscribeFormData(
     val email: String,
     val calendarName: String,
-    val subscribeNewsletter: Boolean
+    val subscribeNewsletter: Boolean?
 ) {
 }

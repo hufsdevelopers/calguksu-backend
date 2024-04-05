@@ -1,9 +1,11 @@
 package org.hufsdevelopers.calguksu.service
 
 import org.hufsdevelopers.calguksu.entities.CalendarEntity
+import org.hufsdevelopers.calguksu.entities.SubscribeNewsletterEntity
 import org.hufsdevelopers.calguksu.entities.SubscriberEntity
 import org.hufsdevelopers.calguksu.exceptions.EmailSendTimeLimitationException
 import org.hufsdevelopers.calguksu.repository.CalendarRepository
+import org.hufsdevelopers.calguksu.repository.SubscribeNewsletterRepository
 import org.hufsdevelopers.calguksu.repository.SubscriberRepository
 import org.springframework.stereotype.Service
 import java.util.*
@@ -14,10 +16,11 @@ const val ADDRESS_EMAIL_CALGUKSU_HUFS: String = "\"Calguksu.com\" <order-calguks
 class SubscribeService(
     val subscriberRepository: SubscriberRepository,
     val calendarRepository: CalendarRepository,
+    val subscribeNewsletterRepository: SubscribeNewsletterRepository,
     val hufsDevelopersMailService: HUFSDevelopersMailService
 ) {
 
-    fun subscribe(calendarEntity: CalendarEntity, email: String, newsletterSubscribe : Boolean) {
+    fun subscribe(calendarEntity: CalendarEntity, email: String, newsletterSubscribe: Boolean) {
         var subscriber = subscriberRepository.findByEmailAndCalendar(email, calendarEntity)
 
         if (subscriber == null) {
@@ -33,11 +36,17 @@ class SubscribeService(
             }
         }
 
+        if (newsletterSubscribe && !subscribeNewsletterRepository.existsBySubscriber(subscriber)) {
+            subscribeNewsletterRepository.save(SubscribeNewsletterEntity(subscriber))
+        }
+
+
         sendSubscribeMail(subscriber, calendarEntity)
     }
 
     fun sendSubscribeMail(subscriberEntity: SubscriberEntity, targetCalendarEntity: CalendarEntity) {
-        val subscribeUrl = "https://calguksu.com/subscription?cn=${targetCalendarEntity.name}&ct=${subscriberEntity.token}"
+        val subscribeUrl =
+            "https://calguksu.com/subscription?cn=${targetCalendarEntity.name}&ct=${subscriberEntity.token}"
         hufsDevelopersMailService.send(
             ADDRESS_EMAIL_CALGUKSU_HUFS,
             subscriberEntity.email,
