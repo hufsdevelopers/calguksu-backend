@@ -1,15 +1,11 @@
 package org.hufsdevelopers.calguksu.service
 
-import org.hufsdevelopers.calguksu.domain.Calendar
-import org.hufsdevelopers.calguksu.domain.Subscriber
-import org.hufsdevelopers.calguksu.exceptions.CalendarNotFoundException
+import org.hufsdevelopers.calguksu.entities.CalendarEntity
+import org.hufsdevelopers.calguksu.entities.SubscriberEntity
 import org.hufsdevelopers.calguksu.exceptions.EmailSendTimeLimitationException
 import org.hufsdevelopers.calguksu.repository.CalendarRepository
 import org.hufsdevelopers.calguksu.repository.SubscriberRepository
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import java.lang.Exception
-import java.lang.NullPointerException
 import java.util.*
 
 const val ADDRESS_EMAIL_CALGUKSU_HUFS: String = "\"Calguksu.com\" <order-calguksu-noreply@hufsdevelopers.org>"
@@ -21,12 +17,12 @@ class SubscribeService(
     val hufsDevelopersMailService: HUFSDevelopersMailService
 ) {
 
-    fun subscribe(calendar: Calendar, email: String) {
-        var subscriber = subscriberRepository.findByEmailAndCalendar(email, calendar)
+    fun subscribe(calendarEntity: CalendarEntity, email: String, newsletterSubscribe : Boolean) {
+        var subscriber = subscriberRepository.findByEmailAndCalendar(email, calendarEntity)
 
         if (subscriber == null) {
             val token = UUID.randomUUID().toString()
-            subscriber = subscriberRepository.save(Subscriber(token, email, calendar, null, null))
+            subscriber = subscriberRepository.save(SubscriberEntity(token, email, calendarEntity, null, null))
         } else {
             if ((subscriber.mailsentOn != null) && (System.currentTimeMillis() - subscriber.mailsentOn!!.toEpochSecond() * 1000) < 1 * 60 * 1000) {
                 return throw EmailSendTimeLimitationException((60 - ((System.currentTimeMillis() - subscriber.mailsentOn!!.toEpochSecond() * 1000)) / 1000).toInt())
@@ -37,15 +33,15 @@ class SubscribeService(
             }
         }
 
-        sendSubscribeMail(subscriber, calendar)
+        sendSubscribeMail(subscriber, calendarEntity)
     }
 
-    fun sendSubscribeMail(subscriber: Subscriber, targetCalendar: Calendar) {
-        val subscribeUrl = "https://calguksu.com/subscription?cn=${targetCalendar.name}&ct=${subscriber.token}"
+    fun sendSubscribeMail(subscriberEntity: SubscriberEntity, targetCalendarEntity: CalendarEntity) {
+        val subscribeUrl = "https://calguksu.com/subscription?cn=${targetCalendarEntity.name}&ct=${subscriberEntity.token}"
         hufsDevelopersMailService.send(
             ADDRESS_EMAIL_CALGUKSU_HUFS,
-            subscriber.email,
-            "${targetCalendar.title} 캘린더가 배달되었습니다.",
+            subscriberEntity.email,
+            "${targetCalendarEntity.title} 캘린더가 배달되었습니다.",
             "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\n" +
                     "        \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
                     "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +
@@ -108,7 +104,7 @@ class SubscribeService(
                     "                            <tr>\n" +
                     "                                <td align=\"center\">\n" +
                     "                                    <p style=\"margin: 0; padding: 0; font-family: BlinkMacSystemFont, 'Apple SD Gothic Neo', '맑은 고딕', sans-serif; font-size: 16px; font-weight: 400; line-height: 1.42; letter-spacing: -0.21px; color: #4A5568; -webkit-text-size-adjust: 100%;\">\n" +
-                    "                                        <u>${targetCalendar.title}</u></p>\n" +
+                    "                                        <u>${targetCalendarEntity.title}</u></p>\n" +
                     "                                </td>\n" +
                     "                            </tr>\n" +
                     "                            <tr>\n" +
@@ -132,7 +128,7 @@ class SubscribeService(
                     "                                            <td width=\"5%\" style=\"border-bottom: 1px solid #E2E8F0;\"></td>\n" +
                     "                                            <td width=\"70%\"\n" +
                     "                                                style=\"padding: 10px 0;  font-family: BlinkMacSystemFont, 'Apple SD Gothic Neo', '맑은 고딕', sans-serif; font-size: 14px; font-weight: 400; line-height: 1.42; letter-spacing: -0.21px; color: #4A5568; -webkit-text-size-adjust: 100%; border-bottom: 1px solid #E2E8F0;\">\n" +
-                    "                                                ${subscriber.token}\n" +
+                    "                                                ${subscriberEntity.token}\n" +
                     "                                            </td>\n" +
                     "                                        </tr>\n" +
                     "                                        <tr>\n" +

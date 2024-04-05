@@ -1,6 +1,5 @@
 package org.hufsdevelopers.calguksu.libs.eventcrawler
 
-import org.hufsdevelopers.calguksu.domain.Calendar
 import java.time.ZonedDateTime
 
 data class CrawledEvent(

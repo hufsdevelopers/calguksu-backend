@@ -2,7 +2,7 @@ package org.hufsdevelopers.calguksu.controller.calguksu
 
 import jakarta.servlet.http.HttpServletResponse
 import org.hufsdevelopers.calguksu.data.HttpResponse
-import org.hufsdevelopers.calguksu.domain.Calendar
+import org.hufsdevelopers.calguksu.entities.CalendarEntity
 import org.hufsdevelopers.calguksu.exceptions.CalendarNotFoundException
 import org.hufsdevelopers.calguksu.exceptions.HttpReponseExcetion
 import org.hufsdevelopers.calguksu.repository.CalendarRepository
@@ -22,7 +22,7 @@ import java.time.ZonedDateTime
 class CalendarController(val calendarRepository: CalendarRepository, val subscriberRepository: SubscriberRepository) {
 
     @GetMapping()
-    fun getCalendars(): ResponseEntity<HttpResponse<List<Calendar>>> {
+    fun getCalendars(): ResponseEntity<HttpResponse<List<CalendarEntity>>> {
         val cal = calendarRepository.findAll()
         return ResponseEntity.ok(HttpResponse(true, calendarRepository.findAll()))
     }

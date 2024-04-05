@@ -1,15 +1,13 @@
-package org.hufsdevelopers.calguksu.domain
+package org.hufsdevelopers.calguksu.entities
 
 import jakarta.persistence.*
-import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.CurrentTimestamp
 import java.time.ZonedDateTime
 
-@Table(name = "subscribers")
+    @Table(name = "subscribers")
 @Entity
-class Subscriber(
-    token: String, email: String, calendar: Calendar, registeredOn: ZonedDateTime?, lastrequestedOn: ZonedDateTime?
+class SubscriberEntity(
+    token: String, email: String, calendarEntity: CalendarEntity, registeredOn: ZonedDateTime?, lastrequestedOn: ZonedDateTime?
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +28,6 @@ class Subscriber(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calendar_id")
-    var calendar: Calendar? = calendar
+    var calendar: CalendarEntity? = calendarEntity
         private set
 }

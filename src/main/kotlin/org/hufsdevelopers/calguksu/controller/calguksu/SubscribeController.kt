@@ -3,17 +3,13 @@ package org.hufsdevelopers.calguksu.controller.calguksu
 import org.apache.commons.validator.routines.EmailValidator
 import org.hufsdevelopers.calguksu.data.HttpResponse
 import org.hufsdevelopers.calguksu.data.SubscribeFormData
-import org.hufsdevelopers.calguksu.domain.Subscriber
 import org.hufsdevelopers.calguksu.exceptions.CalendarNotFoundException
 import org.hufsdevelopers.calguksu.exceptions.HttpReponseExcetion
 import org.hufsdevelopers.calguksu.repository.CalendarRepository
 import org.hufsdevelopers.calguksu.repository.SubscriberRepository
 import org.hufsdevelopers.calguksu.service.SubscribeService
 import org.springframework.http.ResponseEntity
-import org.springframework.validation.Errors
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
-import java.util.UUID
 
 @RestController
 @RequestMapping("/subscribe")

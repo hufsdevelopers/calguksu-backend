@@ -1,13 +1,14 @@
-package org.hufsdevelopers.calguksu.domain
+package org.hufsdevelopers.calguksu.entities
 
 import jakarta.persistence.*
 
 @Table(name = "calendars")
 @Entity
-class Calendar(name: String, title: String, description: String?) {
+class CalendarEntity(name: String, title: String, description: String?) {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val calendarId: Int? = null
+    val calendarId: Int = 0
 
     @Column(name = "name", length = 20, nullable = false)
     var name: String = name

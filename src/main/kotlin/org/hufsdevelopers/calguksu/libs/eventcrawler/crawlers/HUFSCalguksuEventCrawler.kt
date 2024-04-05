@@ -71,8 +71,8 @@ class HUFSCalguksuEventCrawler : CalguksuEventCrawler() {
             val event = json.decodeFromJsonElement(EventDetail.serializer(), eventJson)
             CrawledEvent(
                 description = event.sj,
-                startTimestamp = ZonedDateTime.of(LocalDate.parse(event.bgnde, formatter).atStartOfDay(), zoneId),
-                endTimestamp = ZonedDateTime.of(LocalDate.parse(event.endde, formatter).atTime(23, 59), zoneId),
+                startTimestamp = ZonedDateTime.of(LocalDate.parse(event.bgnde, formatter).atStartOfDay(), zoneId).plusHours(9),
+                endTimestamp = ZonedDateTime.of(LocalDate.parse(event.endde, formatter).atTime(23, 59), zoneId).plusHours(9),
                 allday = true
             )
         }

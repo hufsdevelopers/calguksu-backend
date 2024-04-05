@@ -1,4 +1,4 @@
-package org.hufsdevelopers.calguksu.domain
+package org.hufsdevelopers.calguksu.entities
 
 import jakarta.persistence.*
 import java.time.ZonedDateTime
@@ -6,8 +6,8 @@ import java.time.ZonedDateTime
 
 @Table(name = "events")
 @Entity
-class Event(
-    calendar: Calendar,
+class EventEntity(
+    calendarEntity: CalendarEntity,
     startTimestamp: ZonedDateTime,
     endTimestamp: ZonedDateTime,
     allday: Boolean = false,
@@ -15,11 +15,11 @@ class Event(
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private val eventId: Int? = null
+    private val eventId: Int = 0
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "calendar_id")
-    var calendar: Calendar? = calendar
+    var calendar: CalendarEntity? = calendarEntity
         private set
 
     @Column(name = "start_timestamp")
@@ -36,7 +36,7 @@ class Event(
         private set
 
     override fun equals(other: Any?): Boolean {
-        return if (other is Event) {
+        return if (other is EventEntity) {
             (startTimestamp.toEpochSecond() == other.startTimestamp.toEpochSecond()) && (endTimestamp?.toEpochSecond() == other.endTimestamp?.toEpochSecond()) && description == other.description
         } else {
             false
@@ -46,4 +46,8 @@ class Event(
     override fun toString(): String {
         return "$startTimestamp ~ $endTimestamp : $description"
     }
+}
+
+fun EventEntity.toUniqueKey(): String {
+    return "${this.description}-${this.startTimestamp}-${this.endTimestamp}-${this.allday}"
 }

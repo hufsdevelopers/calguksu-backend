@@ -10,7 +10,7 @@ import net.fortuna.ical4j.model.TimeZoneRegistryFactory
 import net.fortuna.ical4j.model.component.VEvent
 import net.fortuna.ical4j.model.component.VTimeZone
 import net.fortuna.ical4j.model.property.*
-import org.hufsdevelopers.calguksu.domain.Event
+import org.hufsdevelopers.calguksu.entities.EventEntity
 import org.hufsdevelopers.calguksu.repository.CalendarRepository
 import org.hufsdevelopers.calguksu.repository.EventRepository
 import org.jsoup.Jsoup
@@ -33,12 +33,11 @@ class HUFSCalendarService(calendarRepository: CalendarRepository, val eventRepos
 
     val hufsofficialCalendar = calendarRepository.getReferenceById(1)
 
-    @Scheduled(fixedRate = 1000 * 60 * 10)
     fun getUpdates() {
         val wholeSource = Jsoup.connect(URL_CALENDAR_HUFS_AC_KR).get()
 
         // 캘린더 우측에서 각 이벤트 선택
-        val sourceFetchedEvents = mutableListOf<Event>()
+        val sourceFetchedEventEntities = mutableListOf<EventEntity>()
 
         wholeSource.getElementsByClass("sch02_box").forEach { calendar ->
             // 캘린더 좌측에서 캘린더 제목 선택 ex - "2022.00"
@@ -88,9 +87,9 @@ class HUFSCalendarService(calendarRepository: CalendarRepository, val eventRepos
                         ZoneId.of("Asia/Seoul")
                     )
                 }
-                sourceFetchedEvents.add(
-                    Event(
-                        calendar = hufsofficialCalendar,
+                sourceFetchedEventEntities.add(
+                    EventEntity(
+                        calendarEntity = hufsofficialCalendar,
                         startTimestamp = startDate,
                         endTimestamp = endDate ?: startDate,
                         description = description,
@@ -103,7 +102,7 @@ class HUFSCalendarService(calendarRepository: CalendarRepository, val eventRepos
         var calendarChanges = false
 
         val localFetchedEvents = eventRepository.findByCalendar(hufsofficialCalendar).toMutableList()
-        sourceFetchedEvents.distinctBy {
+        sourceFetchedEventEntities.distinctBy {
             it.toString()
         }.forEach { event ->
             if (!localFetchedEvents.remove(event)) {
