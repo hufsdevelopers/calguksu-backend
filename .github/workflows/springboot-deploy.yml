@@ -1,0 +1,51 @@
+name: Spring Boot CI / CD
+
+on:
+  push:
+    branches: ["master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 18
+      uses: actions/setup-java@v3
+      with:
+        java-version: '18'
+        distribution: 'temurin'
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Build with Gradle
+      uses: gradle/gradle-build-action@v3
+      with:
+        arguments: build
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build
+        path: build/libs/*.jar
+        
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: build
+        path: build
+    - name: List JAR files
+      run: ls -l build/
+    - name: Deploy to Server via SCP and Run with Screen
+      env:
+        SERVER_SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        SERVER_IP: ${{ secrets.SERVER_IP }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SERVER_SSH_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        scp -o StrictHostKeyChecking=no build/*.jar ubuntu@$SERVER_IP:~/
+        ssh -o StrictHostKeyChecking=no ubuntu@$SERVER_IP << EOF
+          screen -dmS tm-backend
+          screen -S tm-backend -X stuff "java -jar ~/*.jar\n"
