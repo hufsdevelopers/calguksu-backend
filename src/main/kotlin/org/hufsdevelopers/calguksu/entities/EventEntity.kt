@@ -49,5 +49,5 @@ class EventEntity(
 }
 
 fun EventEntity.toUniqueKey(): String {
-    return "${this.description}-${this.startTimestamp}-${this.endTimestamp}-${this.allday}"
+    return "${this.description}-${this.startTimestamp.toInstant().toEpochMilli()}-${this.endTimestamp.toInstant().toEpochMilli()}-${this.allday}"
 }
