@@ -32,7 +32,7 @@ class SchduledCalendarEventCrawlService(
     val eventRepository: EventRepository
 ) {
 
-    @Scheduled(fixedDelay = 1000 * 10)
+    @Scheduled(fixedDelay = 1000 * 60 * 60)
     fun crawlEvents() = runBlocking {
         eventCrawlers.forEach {
             val calendar = calendarRepository.findFirstByName(it.calendarName) ?: return@forEach
