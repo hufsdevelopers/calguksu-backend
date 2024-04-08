@@ -49,6 +49,7 @@ jobs:
         ssh -o StrictHostKeyChecking=no ubuntu@$SERVER_IP << EOF
           if screen -list | grep -q "tm-backend"; then
             screen -S tm-backend -X quit
+            sleep 5
           fi
           screen -dmS tm-backend
           screen -S tm-backend -X stuff "java -jar ~/*.jar\n"
