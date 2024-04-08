@@ -37,3 +37,5 @@ out/
 .vscode/
 
 /calendars/*.*
+
+/src/main/resources/application.properties
