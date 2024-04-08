@@ -47,7 +47,7 @@ class SubscribeService(
     fun sendSubscribeMail(subscriberEntity: SubscriberEntity, targetCalendarEntity: CalendarEntity) {
         val subscribeUrl =
             "https://calguksu.com/subscription?cn=${targetCalendarEntity.name}&ct=${subscriberEntity.token}"
-        val donateUrl = "https://donation.calguksu.com"
+        val donateUrl = "https://donation.hufsdevelopers.org"
         hufsDevelopersMailService.send(
             ADDRESS_EMAIL_CALGUKSU_HUFS,
             subscriberEntity.email,
