@@ -14,6 +14,9 @@ jobs:
       with:
         java-version: '18'
         distribution: 'temurin'
+    - name: Create application.properties
+      run: |
+        echo "${{ secrets.APPLICATION_PROPERTIES }}" > src/main/resources/application.properties
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
