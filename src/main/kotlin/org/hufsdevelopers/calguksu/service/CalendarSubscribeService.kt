@@ -95,7 +95,7 @@ class SubscribeService(
                     "                <tr>\n" +
                     "                    <td align=\"center\" style=\"padding: 36px 0\">\n" +
                     "                        <a href=\"https://calguksu.com\" target=\"_blank\">\n" +
-                    "                            <img src=\"https://calguksu.com/assets/ic_logo.png\" width=\"180px\" height=\"auto\"/>\n" +
+                    "                            <img src=\"https://calguksu.com/static/logos/apple-icon.png\" width=\"180px\" height=\"auto\"/>\n" +
                     "                        </a>\n" +
                     "                    </td>\n" +
                     "                </tr>\n" +
