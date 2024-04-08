@@ -47,7 +47,9 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         scp -o StrictHostKeyChecking=no build/*.jar ubuntu@$SERVER_IP:~/
         ssh -o StrictHostKeyChecking=no ubuntu@$SERVER_IP << EOF
-          screen -list | grep tm-backend | cut -d. -f1 | awk '{print $1}' | xargs -r kill
+          if screen -list | grep -q "tm-backend"; then
+            screen -S tm-backend -X quit
+          fi
           screen -dmS tm-backend
           screen -S tm-backend -X stuff "java -jar ~/*.jar\n"
         EOF
