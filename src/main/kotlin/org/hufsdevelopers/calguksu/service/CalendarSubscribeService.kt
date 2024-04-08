@@ -47,7 +47,7 @@ class SubscribeService(
     fun sendSubscribeMail(subscriberEntity: SubscriberEntity, targetCalendarEntity: CalendarEntity) {
         val subscribeUrl =
             "https://calguksu.com/subscription?cn=${targetCalendarEntity.name}&ct=${subscriberEntity.token}"
-        val donateUrl = "https://espressowithwater.notion.site/hufsdevelopers-org-1e328f8d1fed41f6b445ebeba4a448a4"
+        val donateUrl = "https://donation.calguksu.com"
         hufsDevelopersMailService.send(
             ADDRESS_EMAIL_CALGUKSU_HUFS,
             subscriberEntity.email,
@@ -96,7 +96,7 @@ class SubscribeService(
                     "        <tr>\n" +
                     "          <td align=\"center\" style=\"padding: 36px 0\">\n" +
                     "            <a href=\"https://calguksu.com\" target=\"_blank\">\n" +
-                    "              <img src=\"https://calguksu.com/static/logos/apple-icon.png\" width=\"180px\" height=\"auto\" />\n" +
+                    "              <img src=\"https://calguksu.com/static/logos/apple-icon.png\" width=\"48px\" height=\"auto\" />\n" +
                     "            </a>\n" +
                     "          </td>\n" +
                     "        </tr>\n" +
